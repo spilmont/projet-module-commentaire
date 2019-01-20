@@ -46,7 +46,7 @@ background-size: cover;
 
 #cont-com {
 
-    height: 500px;
+    height: 1000px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;

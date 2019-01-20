@@ -9,83 +9,97 @@
 $serverName = "localhost";
 $userName = "root";
 $password = "";
-$dbname ="commentaire";
+$dbname = "commentaire";
 
-$conn = new mysqli($serverName,$userName,$password);
-
-
+$conn = new mysqli($serverName, $userName, $password);
 
 
-if($conn->connect_error){
-    die("connect failed:".$conn->connect_error);
-}else{
+if ($conn->connect_error) {
+    die("connect failed:" . $conn->connect_error);
+} else {
     $conn->select_db($dbname);
 }
+
+$limit =5;
+
 ?>
 
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="style.css" >
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="main">
+<div id="main">
     <div id="formulaire">
         <form action="" method="post">
-            <input type="text" class="block" name="pseudo" >
-           <textarea class="block" name="commentaire"></textarea>
+            <input type="text" class="block" name="pseudo">
+            <textarea class="block" name="commentaire"></textarea>
             <input type="submit" name="bouton" value="commenter">
         </form>
 
-<?php
-function afficher(){
+        <?php
+        function afficher(){
 
-    global $conn;
+        global $limit;
+        global $conn;
 
-    $p= array(1=>0,2=>5);
+        $page = (isset($_GET['page'])?$_GET['page']:0);
 
-
-
-    foreach ($p as $cles =>$value){
-
-
-
-            $sql="select  * from `user` order by id desc limit $value, 5";
-
-
- }
+        $pagecourrante =$page *5;
 
 
 
 
 
 
+        $sql = "select  * from `user`  order by id desc limit $pagecourrante,$limit";
 
 
-    $result=  $conn->query($sql);
-    ?>
+        $result = $conn->query($sql);
+        ?>
 
     </div>
     <div id="cont-com">
-    <?php
-    while($row = $result->fetch_assoc()){
-        ?>
+        <?php
+        while ($row = $result->fetch_assoc()) {
+            ?>
 
-    <div id="commentaire">
-        <div id =ent><?= $row['username']." le ".$row['date'] ?></div>
-        <div><?= $row["commentaire"] ?></div>
+            <div id="commentaire">
+                <div id=ent><?= nl2br($row['username']) . " le " . $row['date'] ?></div>
+                <div><?= $row["commentaire"] ?></div>
+            </div>
+            <?php
+        } ?>
     </div>
-    <?php
-    }?>
-    </div>
-    </div>
-    <script type="javascript" src="script.js"></script>
+</div>
+<script type="javascript" src="script.js"></script>
 </body>
 </html>
 <?php
 }
+
+function pagination()
+{
+    global $conn;
+    global $limit;
+
+    $sql = "SELECT COUNT(*) AS nbrcomm FROM `user`";
+    $result = $conn->query($sql);
+    while ($row = $result->fetch_assoc()) {
+        $nbrcomm = $row['nbrcomm'];
+    }
+    $nbrPage = ceil($nbrcomm / $limit);
+    echo "Pages: ";
+    for ($i = 1; $i <= $nbrPage; $i++) {
+        echo '<a href="index.php?page=' . ($i -1) . '">' . $i . '</a> ';
+    }
+}
+
+
+
 
 
 function commentaire()
@@ -93,43 +107,37 @@ function commentaire()
     global $conn;
 
 
-
-    $sql ="insert into `user`(`username`,`commentaire`,`date`) values (?,?,NOW())";
-
-    $username = (isset($_POST['pseudo'])?$_POST['pseudo']:null);
-    $username = filter_var($username,FILTER_SANITIZE_STRING);
-    $commentaire = (isset($_POST['commentaire'])?$_POST['commentaire']:null);
-    $commentaire = filter_var($commentaire,FILTER_SANITIZE_STRING);
+    $sql = "insert into `user`(`username`,`commentaire`,`date`) values (?,?,NOW())";
 
 
 
 
+    if (isset($_POST['pseudo']) and isset($_POST['commentaire'])) {
+
+        $recup1 = $_POST['pseudo'];
+        $recup2 = $_POST['commentaire'];
 
 
-if (isset($_POST['pseudo']) and isset($_POST['commentaire']) ) {
 
-    $recup1 = $_POST['pseudo'];
-    $recup2 = $_POST['commentaire'];
+        $connection = $conn->prepare($sql);
 
+        $connection->bind_param('ss', $recup1, $recup2);
 
-    $connection = $conn->prepare($sql);
-
-    $connection->bind_param('ss', $recup1, $recup2);
-
-    $connection->execute();
+        $connection->execute();
 
 
-    $connection->close();
+        $connection->close();
 
-    header("location:index.php");
+        header("location:index.php");
+
+    }
 
 }
 
-}
+commentaire();
+        afficher();
+pagination();
 
-    commentaire();
-
-afficher();
 ?>
 
 
