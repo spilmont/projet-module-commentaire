@@ -6,6 +6,9 @@
  * Time: 14:16
  */
 
+
+
+
 $serverName = "localhost";
 $userName = "root";
 $password = "";
@@ -20,67 +23,29 @@ if ($conn->connect_error) {
     $conn->select_db($dbname);
 }
 
-$limit =5;
-
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div id="main">
-    <div id="formulaire">
-        <form action="" method="post">
-            <input type="text" class="block" name="pseudo">
-            <textarea class="block" name="commentaire"></textarea>
-            <input type="submit" name="bouton" value="commenter">
-        </form>
-
-        <?php
-        function afficher(){
-
-        global $limit;
-        global $conn;
-
-        $page = (isset($_GET['page'])?$_GET['page']:0);
-
-        $pagecourrante =$page *5;
+$limit = 5;
 
 
 
+        function afficher()
+        {
+
+            global $limit;
+            global $conn;
+
+            $page = (isset($_GET['page']) ? $_GET['page'] : 1);
+            $pagecourrante = ($page - 1) * 5;
+            $sql = "select  * from `user`  order by id desc limit $pagecourrante,$limit";
+            $result = $conn->query($sql);
 
 
+            $arr=array();
+            while ($row = $result->fetch_assoc()) {
 
-        $sql = "select  * from `user`  order by id desc limit $pagecourrante,$limit";
-
-
-        $result = $conn->query($sql);
-        ?>
-
-    </div>
-    <div id="cont-com">
-        <?php
-        while ($row = $result->fetch_assoc()) {
-            ?>
-
-            <div id="commentaire">
-                <div id=ent><?= nl2br($row['username']) . " le " . $row['date'] ?></div>
-                <div><?= $row["commentaire"] ?></div>
-            </div>
-            <?php
-        } ?>
-    </div>
-</div>
-<script type="javascript" src="script.js"></script>
-</body>
-</html>
-<?php
-}
-
+             $arr[] = $row;
+            }
+            echo json_encode($arr);
+        }
 function pagination()
 {
     global $conn;
@@ -92,15 +57,13 @@ function pagination()
         $nbrcomm = $row['nbrcomm'];
     }
     $nbrPage = ceil($nbrcomm / $limit);
-    echo "Pages: ";
-    for ($i = 1; $i <= $nbrPage; $i++) {
-        echo '<a href="index.php?page=' . ($i -1) . '">' . $i . '</a> ';
-    }
+
+        global $page;
+        for ($i = 1; $i <= $nbrPage; $i++) {
+
+        }
+
 }
-
-
-
-
 
 function commentaire()
 {
@@ -112,12 +75,9 @@ function commentaire()
 
 
 
-    if (isset($_POST['pseudo']) and isset($_POST['commentaire'])) {
-
-        $recup1 = $_POST['pseudo'];
-        $recup2 = $_POST['commentaire'];
-
-
+        $recup1 = $_GET['user'];
+        $recup2 = $_GET['comment'];
+        print_r($recup1." ".$recup2) ;
 
         $connection = $conn->prepare($sql);
 
@@ -128,17 +88,20 @@ function commentaire()
 
         $connection->close();
 
-        header("location:index.php");
 
-    }
+
+
 
 }
 
-commentaire();
-        afficher();
-pagination();
 
-?>
+if (isset($_GET['user']) and isset($_GET['commentaire'])) {
+
+commentaire();
+}
+afficher();
+
+
 
 
 

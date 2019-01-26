@@ -3,9 +3,16 @@ body{
     background-image: url(http://www.coloriagesdecoupages.com/wallpaper/cartoon/homer_summer_fond_ecran.jpg);
 background-size: cover;
     background-attachment: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #main{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
     width: 80%;
     background-color: white;
 }
@@ -13,7 +20,7 @@ background-size: cover;
 
 #formulaire {
 
-    width: 100%;
+ width: 100%;
     height: 200px;
     display: flex;
     flex-direction: column;
@@ -27,17 +34,19 @@ background-size: cover;
 
 #commentaire {
 
-    width: 70%;
-    border: black solid;
+    width: 100%;
+
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
     flex-direction: column;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
+
 }
 
 #ent {
+    width: 500px;
     background-color: blue;
     color: white;
     border-top-left-radius: 15px;
@@ -51,5 +60,19 @@ background-size: cover;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
+
+}
+
+#p{
+    display: flex;
+}
+
+#but-admin{
+    display: flex;
+    justify-content: space-around;
+
+    background-color: red;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
 
 }
